@@ -85,5 +85,31 @@
 			blank_time = #{blankTime}
 		WHERE student_attendance_id = #{studentAttendanceId}
 	</update>
+	
+	<select id="notEnterCount" resultType="int">
+
+    SELECT COUNT(*)
+
+    FROM m_section s
+
+    LEFT OUTER JOIN t_student_attendance a
+        ON a.lms_user_id = #{lmsUserId}
+        AND CAST(s.date AS DATE) = CAST(a.training_date AS DATE)
+        AND a.delete_flg = #{deleteFlg}
+
+    WHERE s.course_id = #{courseId}
+
+        AND (
+            a.student_attendance_id IS NULL
+            OR a.training_start_time IS NULL
+            OR a.training_start_time = ''
+            OR a.training_end_time IS NULL
+            OR a.training_end_time = ''
+        )
+
+        AND CAST(s.date AS DATE) &lt; CURRENT_DATE
+
+</select>
+	
 
 </mapper>
