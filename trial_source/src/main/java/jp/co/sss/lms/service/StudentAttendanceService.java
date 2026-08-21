@@ -334,4 +334,44 @@ public class StudentAttendanceService {
 		return messageUtil.getMessage(Constants.PROP_KEY_ATTENDANCE_UPDATE_NOTICE);
 	}
 
+		
+	/**
+	 * 過去日の勤怠未入力チェック
+	 * 
+	 * @param attendanceManagementDtoList
+	 * @return 未入力がある場合 true
+	 */
+	public boolean hasUninputPastAttendance(List<AttendanceManagementDto> attendanceManagementDtoList) {
+		// 本日の研修日を取得
+		Date today = attendanceUtil.getTrainingDate();
+
+		for (AttendanceManagementDto dto : attendanceManagementDtoList) {
+			Date trainingDate = dto.getTrainingDate();
+
+			// 研修日付が存在し、かつ「本日より前（過去日）」の場合のみ判定
+			if (trainingDate != null && trainingDate.before(today)) {
+
+				// Mapperを呼び出して対象日の勤怠エンティティを取得
+				TStudentAttendance tStudentAttendance = tStudentAttendanceMapper.findByLmsUserIdAndTrainingDate(
+						loginUserDto.getLmsUserId(),
+						trainingDate,
+						Constants.DB_FLG_FALSE
+				);
+
+				// データが存在しない、または出勤時間・退勤時間のどちらかが空文字("")またはnullの場合
+				if (tStudentAttendance == null) {
+					return true;
+				}
+				
+				String startTime = tStudentAttendance.getTrainingStartTime();
+				String endTime = tStudentAttendance.getTrainingEndTime();
+
+				if (startTime == null || startTime.isEmpty() || endTime == null || endTime.isEmpty()) {
+					return true; // 未入力発見
+				}
+			}
+		}
+		return false;
+	}
+
 }

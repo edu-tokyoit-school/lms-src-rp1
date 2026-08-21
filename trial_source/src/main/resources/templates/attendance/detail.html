@@ -73,13 +73,16 @@
 		</div>
 	</div>
 
-	<script type="text/javascript" th:inline="javascript">
+<script type="text/javascript" th:inline="javascript">
 		$(function() {
-			$("#now").text('現在の時刻は　' + getClock() + '　です。');
+			$("#now").text('現在の時刻は ' + getClock() + ' です。');
 			setInterval(function() {
-				$("#now").text('現在の時刻は　' + getClock() + '　です。');
+				$("#now").text('現在の時刻は ' + getClock() + ' です。');
 			}, 1000);
+
+				alert("過去の勤怠情報に未入力項目があります。");
 		});
+
 		function getClock() {
 			const today =  new Date();
 			const hours = ('0' + today.getHours()).slice(-2);

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import jp.co.sss.lms.dto.AttendanceManagementDto;
 import jp.co.sss.lms.dto.LoginUserDto;
 import jp.co.sss.lms.form.AttendanceForm;
+import jp.co.sss.lms.mapper.TStudentAttendanceMapper;
 import jp.co.sss.lms.service.StudentAttendanceService;
 import jp.co.sss.lms.util.Constants;
 
@@ -26,6 +27,8 @@ import jp.co.sss.lms.util.Constants;
 public class AttendanceController {
 
 	@Autowired
+    private TStudentAttendanceMapper tStudentAttendanceMapper;
+	@Autowired
 	private StudentAttendanceService studentAttendanceService;
 	@Autowired
 	private LoginUserDto loginUserDto;
@@ -33,11 +36,8 @@ public class AttendanceController {
 	/**
 	 * 勤怠管理画面 初期表示
 	 * 
-	 * @param lmsUserId
-	 * @param courseId
 	 * @param model
 	 * @return 勤怠管理画面
-	 * @throws ParseException
 	 */
 	@RequestMapping(path = "/detail", method = RequestMethod.GET)
 	public String index(Model model) {
@@ -47,9 +47,14 @@ public class AttendanceController {
 				.getAttendanceManagement(loginUserDto.getCourseId(), loginUserDto.getLmsUserId());
 		model.addAttribute("attendanceManagementDtoList", attendanceManagementDtoList);
 
+		// ★追加：Serviceから過去日の未入力チェック結果を取得してModelにセット
+		boolean hasUninputPastAttendance = studentAttendanceService
+				.hasUninputPastAttendance(attendanceManagementDtoList);
+		model.addAttribute("hasUninputPastAttendance", hasUninputPastAttendance);
+
 		return "attendance/detail";
 	}
-
+	
 	/**
 	 * 勤怠管理画面 『出勤』ボタン押下
 	 * 
