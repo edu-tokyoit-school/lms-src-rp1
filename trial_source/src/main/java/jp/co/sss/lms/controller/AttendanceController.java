@@ -33,36 +33,37 @@ public class AttendanceController {
 	/**
 	 * 勤怠管理画面 初期表示
 	 * 
-	 * @param lmsUserId
-	 * @param courseId
 	 * @param model
 	 * @return 勤怠管理画面
-	 * @throws ParseException
 	 */
 	@RequestMapping(path = "/detail", method = RequestMethod.GET)
 	public String index(Model model) {
 
-		// 勤怠一覧の取得
+		// 勤怠記録一覧の取得
 		List<AttendanceManagementDto> attendanceManagementDtoList = studentAttendanceService
 				.getAttendanceManagement(loginUserDto.getCourseId(), loginUserDto.getLmsUserId());
 		model.addAttribute("attendanceManagementDtoList", attendanceManagementDtoList);
+
+		// 過去日から未入力チェックしてるところ
+		boolean notEnterCheck = studentAttendanceService
+				.notEnterCheck(attendanceManagementDtoList);
+		model.addAttribute("notEnterCheck", notEnterCheck);
 
 		return "attendance/detail";
 	}
 
 	/**
 	 * 勤怠管理画面 『出勤』ボタン押下
-	 * 
+	 * hasUninputPastAttendance
 	 * @param model
 	 * @return 勤怠管理画面
 	 */
 	@RequestMapping(path = "/detail", params = "punchIn", method = RequestMethod.POST)
 	public String punchIn(Model model) {
 
-		// 更新前のチェック
 		String error = studentAttendanceService.punchCheck(Constants.CODE_VAL_ATWORK);
 		model.addAttribute("error", error);
-		// 勤怠登録
+
 		if (error == null) {
 			String message = studentAttendanceService.setPunchIn();
 			model.addAttribute("message", message);
@@ -112,6 +113,7 @@ public class AttendanceController {
 		// 勤怠管理リストの取得
 		List<AttendanceManagementDto> attendanceManagementDtoList = studentAttendanceService
 				.getAttendanceManagement(loginUserDto.getCourseId(), loginUserDto.getLmsUserId());
+		
 		// 勤怠フォームの生成
 		AttendanceForm attendanceForm = studentAttendanceService
 				.setAttendanceForm(attendanceManagementDtoList);
@@ -136,12 +138,17 @@ public class AttendanceController {
 		// 更新
 		String message = studentAttendanceService.update(attendanceForm);
 		model.addAttribute("message", message);
+
 		// 一覧の再取得
 		List<AttendanceManagementDto> attendanceManagementDtoList = studentAttendanceService
 				.getAttendanceManagement(loginUserDto.getCourseId(), loginUserDto.getLmsUserId());
 		model.addAttribute("attendanceManagementDtoList", attendanceManagementDtoList);
 
+		// ★追加：更新後に詳細画面へ戻るため、ここでも未入力チェックを行ってModelに詰める
+		boolean notEnterCheck = studentAttendanceService
+				.notEnterCheck(attendanceManagementDtoList);
+		model.addAttribute("notEnterCheck", notEnterCheck);
+
 		return "attendance/detail";
 	}
-
 }

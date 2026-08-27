@@ -38,6 +38,14 @@ public interface TStudentAttendanceMapper {
 	TStudentAttendance findByLmsUserIdAndTrainingDate(@Param("lmsUserId") Integer lmsUserId,
 			@Param("trainingDate") Date trainingDate, @Param("deleteFlg") Short deleteFlg);
 
+	
+	
+	int notEnterCount(@Param("lmsUserId") Integer lmsUserId,
+			@Param("deleteFlg") Short deleteFlg,@Param("trainingDate") Date trainingDate);
+	
+	
+	
+	
 	/**
 	 * 勤怠管理画面用DTOリスト取得
 	 * 
