@@ -147,4 +147,75 @@ public class AttendanceUtil {
 		return false;
 	}
 
+	//task.26 勤怠時間の編集方法変更
+	/**
+	 * 時間マップを取得
+	 * 
+	 * @return 時間マップ
+	 */
+	public LinkedHashMap<Integer, String> getHourMap() { //キー→実際にフォームで選ばれた時に使う数字。値→画面表示用の"00"等の2桁表示。
+		LinkedHashMap<Integer, String> map = new LinkedHashMap<>(); //LinkedHashMapは入れた数字の順番を保つ。→プルダウンは順番に並んでほしい。
+		map.put(null, ""); //プルダウンの一番上の空欄の選択肢。
+		for (int i = 0; i < 24; i++) {
+			map.put(i, String.format("%02d", i)); //二桁に直して選択肢を一つ入れる。
+		}
+		return map;
+
+	}
+
+	//task.26
+	/**
+	 * 分マップ(0～59)を取得
+	 * 
+	 * @return　分マップ
+	 */
+	public LinkedHashMap<Integer, String> getMinuteMap() {
+		LinkedHashMap<Integer, String> map = new LinkedHashMap<>();
+		map.put(null, "");
+		for (int i = 0; i < 60; i++) {
+			map.put(i, String.format("%02d", i));
+		}
+		return map;
+	}
+	
+	//task.26
+	/**
+	 * 時刻文字列("HH:mm")から「時間」を抽出する。
+	 *
+	 * @param timeStr 時刻文字列(例:"09:15")
+	 * @return 時間(Integer)。取得できない場合はnull
+	 */
+	public Integer getHour(String timeStr) {
+	    // "HH:mm"形式に必要な最小桁数(5文字)に満たない場合はnull
+	    if (timeStr == null || timeStr.length() < 5) {
+	        return null;
+	    }
+	    try {
+	        // インデックス0～1(先頭の2桁:"HH")を切り出して「時間」に変換
+	        return Integer.parseInt(timeStr.substring(0, 2));
+	    } catch (NumberFormatException e) {
+	        return null;
+	    }
+	}
+	
+	//task.26
+	/**
+	 * 時刻文字列("HH:mm")から「分」を抽出する。
+	 *
+	 * @param timeStr 時刻文字列(例:"09:15")
+	 * @return 分(Integer)。取得できない場合はnull
+	 */
+	public Integer getMinute(String timeStr) {
+	    // "HH:mm"形式に必要な最小桁数(5文字)に満たない場合はnull
+	    if (timeStr == null || timeStr.length() < 5) {
+	        return null;
+	    }
+	    try {
+	        // インデックス3～4(末尾の2桁:"mm")を切り出して「分」に変換
+	        return Integer.parseInt(timeStr.substring(3, 5));
+	    } catch (NumberFormatException e) {
+	        return null;
+	    }
+	}
+	
 }
